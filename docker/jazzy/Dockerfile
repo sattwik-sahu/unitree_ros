@@ -21,6 +21,7 @@ RUN apt-get update && \
         python3-pip \
         python3-vcstool \
         vim \
+        ros-${ROS_DISTRO}-rmw-zenoh-cpp \
         wget && \
     rm -rf /var/lib/apt/lists/*
 
