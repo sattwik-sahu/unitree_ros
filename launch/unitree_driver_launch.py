@@ -21,25 +21,44 @@ def generate_launch_description():
         default_value="false",
         description="Uses the wifi IP for communicating with the robot",
     )
+    tf_prefix_arg = DeclareLaunchArgument(
+        "tf_prefix",
+        default_value="unitree",
+        description="The prefix to use before the tf topics from this package",
+    )
 
     return LaunchDescription(
-        [params_file_arg, use_wifi_arg, OpaqueFunction(function=launch_unitree_driver)]
+        [
+            params_file_arg,
+            use_wifi_arg,
+            tf_prefix_arg,
+            OpaqueFunction(function=launch_unitree_driver),
+        ]
     )
 
 
 def launch_unitree_driver(context):
     params_file = LaunchConfiguration("params_file")
     wifi = context.launch_configurations.get("wifi", "false")
+    tf_prefix = LaunchConfiguration("tf_prefix").perform(context)
+
     if wifi == "true":
         robot_ip = "192.168.12.1"
     else:
         robot_ip = "192.168.123.161"
 
-    unitree_driver_node = Node(
-        package="unitree_ros",
-        executable="unitree_driver",
-        parameters=[params_file, {"robot_ip": robot_ip}],
-        output="screen",
-    )
-
-    return [unitree_driver_node]
+    return [
+        Node(
+            package="unitree_ros",
+            executable="unitree_driver",
+            parameters=[
+                params_file,
+                {"robot_ip": robot_ip},
+            ],
+            output="screen",
+            remappings=[
+                ("/tf", f"/{tf_prefix}/tf"),
+                ("/tf_static", f"/{tf_prefix}/tf_static"),
+            ],
+        )
+    ]
