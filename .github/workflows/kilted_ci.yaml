@@ -23,8 +23,8 @@ jobs:
           submodules: recursive
 
       - name: Build ROS 2 package
-        uses: ros-tooling/action-ros-ci@v0.3
+        uses: ros-tooling/action-ros-ci@v0.4
         with:
-          package-name: unitree_ros 
+          package-name: unitree_ros
           target-ros2-distro: kilted
 
